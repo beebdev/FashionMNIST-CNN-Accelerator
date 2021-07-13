@@ -40,6 +40,10 @@ def plot_value_array(i, predictions_array, true_label):
 fasion_mnist = tf.keras.datasets.fashion_mnist
 (train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
 
+# reshape dataset to have a single channel
+train_images = train_images.reshape((train_images.shape[0], 28, 28, 1))
+test_images = test_images.reshape((test_images.shape[0], 28, 28, 1))
+
 # Class label names associated to each label number
 class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
                'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
@@ -50,6 +54,7 @@ test_images = test_images / 255.0
 
 # Building the model
 model = tf.keras.Sequential([
+    tf.keras.layers.Conv2D(32, (3, 3), padding='same', activation='relu', kernel_initializer='he_uniform', input_shape=(28, 28, 1)),
     tf.keras.layers.Flatten(input_shape=(28,28)),
     tf.keras.layers.Dense(128, activation='relu'),
     tf.keras.layers.Dense(10)
