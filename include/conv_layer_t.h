@@ -12,6 +12,10 @@ struct conv_layer_t {
 	uint16_t stride;
 	uint16_t extend_filter;
 
+	/*
+	 * Stride: The amount of movement over the image
+	 * Extend_filter
+	*/
 	conv_layer_t(uint16_t stride, uint16_t extend_filter, uint16_t number_filters, tdsize in_size)
 		:
 		grads_in(in_size.x, in_size.y, in_size.z),
@@ -86,7 +90,7 @@ struct conv_layer_t {
 			0,
 			normalize_range(a / stride, out.size.x, false),
 			normalize_range(b / stride, out.size.y, false),
-			(int)filters.size() - 1,
+			(int) filters.size() - 1,
 		};
 	}
 
@@ -100,7 +104,7 @@ struct conv_layer_t {
 			tensor_t<float>& filter_data = filters[filter];
 			for (int x = 0; x < out.size.x; x++) {
 				for (int y = 0; y < out.size.y; y++) {
-					point_t mapped = map_to_input({ (uint16_t)x, (uint16_t)y, 0 }, 0);
+					point_t mapped = map_to_input({ (uint16_t) x, (uint16_t) y, 0 }, 0);
 					float sum = 0;
 					for (int i = 0; i < extend_filter; i++)
 						for (int j = 0; j < extend_filter; j++)

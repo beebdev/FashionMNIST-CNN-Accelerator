@@ -1,4 +1,4 @@
-#include "byteswap.h"
+#include "include/byteswap.h"
 #include "include/cnn.h"
 #include <algorithm>
 #include <cassert>
@@ -14,15 +14,12 @@ float train(vector<layer_t*>& layers, tensor_t<float>& data, tensor_t<float>& ex
 	for (int i = 0; i < layers.size(); i++) {
 		if (i == 0) {
 			activate(layers[i], data);
-		} else
-
-		{
+		} else {
 			activate(layers[i], layers[i - 1]->out);
 		}
 	}
 
 	tensor_t<float> grads = layers.back()->out - expected;
-
 	for (int i = layers.size() - 1; i >= 0; i--) {
 		if (i == layers.size() - 1) {
 			calc_grads(layers[i], grads);
@@ -77,8 +74,8 @@ uint8_t* read_file(const char* szFile) {
 vector<case_t> read_test_cases() {
 	vector<case_t> cases;
 
-	uint8_t* train_image = read_file("train-images.idx3-ubyte");
-	uint8_t* train_labels = read_file("train-labels.idx1-ubyte");
+	uint8_t* train_image = read_file("data/Fasion/train-images-idx3-ubyte");
+	uint8_t* train_labels = read_file("data/Fasion/train-labels-idx1-ubyte");
 
 	uint32_t case_count = byteswap_uint32(*(uint32_t*) (train_image + 4));
 
@@ -104,53 +101,46 @@ vector<case_t> read_test_cases() {
 }
 
 int main() {
-	cout << "Reading test cases...";
+	/* Read test cases */
 	vector<case_t> cases = read_test_cases();
-	cout << "Done" << endl;
+	cout << "Read data OK" << endl;
 
-	cout << "Creating layers for model...";
+	/* Setup layers for model */
 	vector<layer_t*> layers;
 	conv_layer_t* layer1 = new conv_layer_t(1, 5, 8, cases[0].data.size); // 28 * 28 * 1 -> 24 * 24 * 8
 	relu_layer_t* layer2 = new relu_layer_t(layer1->out.size);
 	pool_layer_t* layer3 = new pool_layer_t(2, 2, layer2->out.size); // 24 * 24 * 8 -> 12 * 12 * 8
 	fc_layer_t* layer4 = new fc_layer_t(layer3->out.size, 10);		 // 4 * 4 * 16 -> 10
-
 	layers.push_back((layer_t*) layer1);
 	layers.push_back((layer_t*) layer2);
 	layers.push_back((layer_t*) layer3);
 	layers.push_back((layer_t*) layer4);
-	cout << "Done" << endl;
+	cout << "Layers OK" << endl;
 
-
-	cout << "Starting training." << endl;
+	/* Start training */
 	struct timeval training_t1, training_t2;
+	cout << "Training start." << endl;
 	gettimeofday(&training_t1, NULL);
+
 	int ic = 0;
 	float amse = 0;
-	for (long ep = 0; ep < 100000;) {
-
+	for (long ep = 0; ep < 200000;) {
 		for (case_t& t : cases) {
 			float xerr = train(layers, t.data, t.out);
 			amse += xerr;
-
 			ep++;
 			ic++;
-
 			if (ep % 1000 == 0)
 				cout << "case " << ep << " err=" << amse / ic << endl;
-
-			// if ( GetAsyncKeyState( VK_F1 ) & 0x8000 )
-			// {
-			//	   printf( "err=%.4f%\n", amse / ic  );
-			//	   goto end;
-			// }
 		}
 	}
-	// end:
+
+	/* Training done, check time duration */
 	gettimeofday(&training_t2, NULL);
 	double elapsedTime = (training_t2.tv_sec - training_t1.tv_sec);
 	elapsedTime += (training_t2.tv_usec - training_t1.tv_usec) / 1000000.0;
 	cout << "Training done. Duration: " << elapsedTime << "sec" << endl;
+
 
 	// while (true) {
 	uint8_t* data = read_file("test.ppm");

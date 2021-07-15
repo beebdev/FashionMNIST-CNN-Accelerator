@@ -11,8 +11,7 @@ struct pool_layer_t {
 	uint16_t extend_filter;
 
 	pool_layer_t(uint16_t stride, uint16_t extend_filter, tdsize in_size)
-		:
-		grads_in(in_size.x, in_size.y, in_size.z),
+		: grads_in(in_size.x, in_size.y, in_size.z),
 		in(in_size.x, in_size.y, in_size.z),
 		out(
 			(in_size.x - extend_filter) / stride + 1,
@@ -67,7 +66,7 @@ struct pool_layer_t {
 			0,
 			normalize_range(a / stride, out.size.x, false),
 			normalize_range(b / stride, out.size.y, false),
-			(int)out.size.z - 1,
+			(int) out.size.z - 1,
 		};
 	}
 
@@ -80,7 +79,7 @@ struct pool_layer_t {
 		for (int x = 0; x < out.size.x; x++) {
 			for (int y = 0; y < out.size.y; y++) {
 				for (int z = 0; z < out.size.z; z++) {
-					point_t mapped = map_to_input({ (uint16_t)x, (uint16_t)y, 0 }, 0);
+					point_t mapped = map_to_input({ (uint16_t) x, (uint16_t) y, 0 }, 0);
 					float mval = -FLT_MAX;
 					for (int i = 0; i < extend_filter; i++)
 						for (int j = 0; j < extend_filter; j++) {
