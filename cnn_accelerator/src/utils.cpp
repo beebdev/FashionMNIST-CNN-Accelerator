@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include <stdint.h>
 #include <stdlib.h>
+#include "include/utils.h"
+
 
 int reverse_int(int i) {
     unsigned char c1, c2, c3, c4;
@@ -86,27 +87,4 @@ void read_test_cases() {
     printf("All good!\n");
     free(train_images);
     free(train_labels);
-}
-
-// void conv_layer() {
-// }
-
-// void relu_layer() {}
-
-// void pool_layer() {}
-
-// void fc_layer() {}
-
-int main() {
-
-    // Read dataset
-
-    // Create layers
-
-    // Training
-
-    // Classification
-
-    read_test_cases();
-    return 0;
 }

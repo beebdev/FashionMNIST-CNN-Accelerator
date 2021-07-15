@@ -74,8 +74,8 @@ uint8_t* read_file(const char* szFile) {
 vector<case_t> read_test_cases() {
 	vector<case_t> cases;
 
-	uint8_t* train_image = read_file("data/Fasion/train-images-idx3-ubyte");
-	uint8_t* train_labels = read_file("data/Fasion/train-labels-idx1-ubyte");
+	uint8_t* train_image = read_file("data/Fashion/train-images-idx3-ubyte");
+	uint8_t* train_labels = read_file("data/Fashion/train-labels-idx1-ubyte");
 
 	uint32_t case_count = byteswap_uint32(*(uint32_t*) (train_image + 4));
 
