@@ -3,6 +3,7 @@
 #include <cassert>
 #include <vector>
 #include <string.h>
+#include <cstdio>
 
 template<typename T>
 struct tensor_t
