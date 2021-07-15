@@ -25,6 +25,6 @@ https://www.notion.so/FasionMNIST-CNN-Accelerator-978da2b835f0482b9ddab8841dcc02
 5. Run the python script to obtain results.
 
 ## Resources
-* Fashion-MNIST repository: https://github.com/zalandoresearch/fashion-mnist
-* Tensorflow keras tutorial on classifying FasionMNIST: https://www.tensorflow.org/tutorials/keras/classification
-* simple-cnn repository: https://github.com/can1357/simple_cnn
+* Fashion-MNIST repository: [link](https://github.com/zalandoresearch/fashion-mnist)
+* Tensorflow keras tutorial on classifying FasionMNIST: [link](https://www.tensorflow.org/tutorials/keras/classification)
+* simple-cnn repository: [link](https://github.com/can1357/simple_cnn)
