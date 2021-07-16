@@ -17,7 +17,6 @@ struct relu_layer_t
 	{
 	}
 
-
 	void activate( tensor_t<float>& in )
 	{
 		this->in = in;
