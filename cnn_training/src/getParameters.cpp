@@ -1,5 +1,7 @@
 #include "include/byteswap.h"
 #include "include/cnn.h"
+#include "include/types.h"
+#include <string>
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
@@ -7,6 +9,10 @@
 #include <fstream>
 #include <iostream>
 #include <sys/time.h>
+
+using std::cerr;
+using std::endl;
+using std::ofstream;
 
 using namespace std;
 
@@ -100,6 +106,78 @@ vector<case_t> read_test_cases() {
     return cases;
 }
 
+void save_tensor_float(tensor_t<float>& data,ofstream& outdata) {
+	int mx = data.size.x;
+	int my = data.size.y;
+	int mz = data.size.z;
+
+	for ( int z = 0; z < mz; z++ )
+	{
+        for ( int y = 0; y < my; y++ )
+		{
+			for ( int x = 0; x < mx; x++ )
+			{
+                outdata << (float)data.get( x, y, z );
+                outdata << " ";
+            }
+            outdata << "\n";
+		}
+	}
+}
+
+void save_layer_type(layer_type type,ofstream& outdata) {
+    const char* s = 0;
+#define PROCESS_VAL(p) case(p): s = #p; break;
+    switch(type){
+        PROCESS_VAL(layer_type::conv);     
+        PROCESS_VAL(layer_type::fc);     
+        PROCESS_VAL(layer_type::pool);
+        PROCESS_VAL(layer_type::relu);
+        PROCESS_VAL(layer_type::dropout_layer);
+    }
+#undef PROCESS_VAL
+
+    outdata << s << "\n";
+}
+
+void save_integer(uint16_t val,ofstream& outdata) {
+    outdata << val << "\n";
+}
+
+void save_vector_tensor_float(vector<tensor_t<float>> data,ofstream& outdata) {
+    for (auto iter = data.begin(); iter != data.end(); ++iter) {
+        save_tensor_float(*iter,outdata);
+    } 
+}
+
+void save_tensor_gradient(tensor_t<gradient_t> data,ofstream& outdata) {
+	int mx = data.size.x;
+	int my = data.size.y;
+	int mz = data.size.z;
+
+	for ( int z = 0; z < mz; z++ )
+	{
+        for ( int y = 0; y < my; y++ )
+		{
+			for ( int x = 0; x < mx; x++ )
+			{
+                outdata << (float)data.get( x, y, z ).grad;
+                outdata << " | ";
+                outdata << (float)data.get( x, y, z ).oldgrad;
+                outdata << " ";
+            }
+            outdata << "\n";
+		}
+	}
+}
+
+void save_vector_tensor_gradient(vector<tensor_t<gradient_t>> data,ofstream& outdata) {
+    for ( int k = 0; k < data.size(); k++ )
+    {
+        save_tensor_gradient(data[k],outdata);
+    }
+}
+
 int main() {
     /* Read test cases */
     vector<case_t> cases = read_test_cases();
@@ -134,14 +212,71 @@ int main() {
                 cout << "case " << ep << " err=" << amse / ic << endl;
         }
     }
-
     
+    /* Saving Model */
+    ofstream outdata; // outdata is like cin
+    outdata.open("weight.txt"); // opens the file
+    if( !outdata ) { // file couldn't be opened
+        cerr << "Error: file could not be opened" << endl;
+        exit(1);
+    }
+
+    for (int i=0; i < layers.size(); ++i) {
+
+        save_layer_type(layers[i]->type,outdata);
+
+        outdata << "input:\n";
+        save_tensor_float(layers[i]->in,outdata);
+
+        outdata << "output:\n";
+        save_tensor_float(layers[i]->out,outdata);
+
+        outdata << "grads_in \n";
+        save_tensor_float(layers[i]->grads_in,outdata);
+
+        //special attribute corresponding to layers
+        if (layers[i]->type == layer_type::conv) {
+            conv_layer_t* conv_layer = (conv_layer_t*)layers[i];
+            outdata << "stride\n";
+            save_integer(conv_layer->stride,outdata);
+            outdata << "extend_filter\n";
+            save_integer(conv_layer->extend_filter,outdata);
+            outdata << "filters\n";
+            save_vector_tensor_float(conv_layer->filters,outdata);
+            outdata << "gradients\n";
+            save_vector_tensor_gradient(conv_layer->filter_grads,outdata);
+        }
+
+    }
+    outdata.close();
+
+    // /* loading out layer */
+    // vector<layer_t*> load_layers;
+    // ifstream in_file;
+    // in_file.open("weight.txt");
+
+    // if (!in_file) {
+    //     cerr << "Unable to open file datafile.txt";
+    //     exit(1);   // call system to stop
+    // }
+    // string val;
+    // while(in_file >> val) {
+    //     if (val == "|") {
+    //         continue;
+    //     }
+    //     if (val == "layer_type::conv") {
+    //         // populate the data structure
+    //         layer_t 
+    //     }
+
+    //     //cout << val << "\n";
+    // }    
+
     /* Training done, check time duration */
     gettimeofday(&training_t2, NULL);
     double elapsedTime = (training_t2.tv_sec - training_t1.tv_sec);
     elapsedTime += (training_t2.tv_usec - training_t1.tv_usec) / 1000000.0;
     cout << "Training done. Duration: " << elapsedTime << "sec" << endl;
 
-    /* Save Model Here */
     
 }
