@@ -13,7 +13,8 @@ struct relu_layer_t {
 		:
 		in(in_size.x, in_size.y, in_size.z),
 		out(in_size.x, in_size.y, in_size.z),
-		grads_in(in_size.x, in_size.y, in_size.z) {}
+		grads_in(in_size.x, in_size.y, in_size.z) {
+	}
 
 	void activate(tensor_t<float> &in) {
 		this->in = in;
@@ -47,7 +48,7 @@ struct relu_layer_t {
 	}
 
 	void save_weights(std::ofstream &outfile) {
-		// RELU does not need weights
+		// No weights for relu
 		return;
 	}
 };

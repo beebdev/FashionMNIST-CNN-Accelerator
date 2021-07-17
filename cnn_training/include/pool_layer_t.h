@@ -79,7 +79,7 @@ struct pool_layer_t {
 		for (int x = 0; x < out.size.x; x++) {
 			for (int y = 0; y < out.size.y; y++) {
 				for (int z = 0; z < out.size.z; z++) {
-					point_t mapped = map_to_input({(uint16_t) x, (uint16_t) y, 0}, 0);
+					point_t mapped = map_to_input({ (uint16_t) x, (uint16_t) y, 0 }, 0);
 					float mval = -FLT_MAX;
 					for (int i = 0; i < extend_filter; i++)
 						for (int j = 0; j < extend_filter; j++) {

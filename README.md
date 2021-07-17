@@ -18,11 +18,15 @@ https://www.notion.so/FasionMNIST-CNN-Accelerator-978da2b835f0482b9ddab8841dcc02
 * data/ - Includes the training and test data sets for MNIST and FashionMNIST
 
 ## Quick start
-1. Compile the cnn-training program in the ```cnn_training``` directory by running ```make all``` in the directory.
-2. Run the program to obtain a file of parameters that will be saved to ```cnn_accelerator/include/weights.h```
-3. Compile the FasionMNIST-cnn code in the  ```cnn_accelerator``` directory
-4. Run ```fasionMNIST``` to execute image recognition on the test dataset
-5. Run the python script to obtain results.
+### Weight training and extraction
+Since we only want to accelerate the classification process, we have a seperate program for training the mdoel and saving the trained parameters to a ```weights.txt``` file. The ```getParameters.py``` script will scrap the trained weights and produce a ```weights.h``` header file saved in the ```cnn_accelerator/include```. This will be compiled to the classification program.
+```bash
+cd path/to/FashionMNIST-CNN-Accelerator/
+cd cnn_training
+./train_parameters.sh
+```
+
+### CNN Classification Accelerator
 
 ## Resources
 * Fashion-MNIST repository: [link](https://github.com/zalandoresearch/fashion-mnist)

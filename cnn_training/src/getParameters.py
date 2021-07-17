@@ -11,18 +11,24 @@ with open(src_filename, "r") as src, open(sink_filename, "w") as sink:
         if "CONV start" in line:
             state = "CONV"
             cols = line.split(" ")
-            nFilter = int(cols[2])
-            nZ = int(cols[3])
-            nExtendFilter = int(cols[4])
-            # TODO setup
+            conv = []
+            conv_filter = []
         elif "FC start" in line:
             state = "FC"
             cols = line.split(" ")
-            nHeight = int(cols[2])
-            nWidth = int(cols[3])
-            # TODO setup
+            fc = []
         elif "end" in line:
             state = None
         elif "=" in line:
-            continue
+            if state == "CONV":
+                conv.append(conv_filter)
         else:
+            cols = line.split(" ")
+            if state == "CONV":
+                conv_filter.append(cols[:-1])
+            elif state == "FC":
+                fc.append(cols[:-1])
+    src.close()
+    sink.close()
+    print(conv)
+    print(fc)

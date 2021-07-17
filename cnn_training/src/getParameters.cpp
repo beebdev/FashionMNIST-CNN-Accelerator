@@ -75,7 +75,7 @@ vector<case_t> read_test_cases() {
     uint32_t case_count = byteswap_uint32(*(uint32_t *) (train_image + 4));
 
     for (int i = 0; i < case_count; i++) {
-        case_t c{tensor_t<float>(28, 28, 1), tensor_t<float>(10, 1, 1)};
+        case_t c{ tensor_t<float>(28, 28, 1), tensor_t<float>(10, 1, 1) };
 
         uint8_t *img = train_image + 16 + i * (28 * 28);
         uint8_t *label = train_labels + 8 + i;
@@ -114,14 +114,14 @@ vector<layer_t *> config_model(vector<case_t> &cases) {
     return layers;
 }
 
-void model_fit(vector<layer_t *> &layers, vector<case_t> &cases, long epoch) {
+void model_fit(vector<layer_t *> &layers, vector<case_t> &cases) {
     struct timeval training_t1, training_t2;
-    cout << "Training start. Total epoch=" << epoch << endl;
+    cout << "Training start." << endl;
     gettimeofday(&training_t1, NULL);
 
     int ic = 0;
     float amse = 0;
-    for (long ep = 0; ep < epoch;) {
+    for (long ep = 0; ep < 100000;) {
         for (case_t &t : cases) {
             float xerr = train(layers, t.data, t.out);
             amse += xerr;
@@ -153,8 +153,8 @@ int main() {
     /* Read test cases */
     vector<case_t> cases = read_test_cases();
     vector<layer_t *> layers = config_model(cases);
-    // model_fit(layers, cases, 100000);
-    model_fit(layers, cases, 1000);
+    model_fit(layers, cases);
+    // model_fit(layers, cases, 1000);
     save_parameters(layers, "weights.txt");
     cout << "getParameters done." << endl;
     return 0;

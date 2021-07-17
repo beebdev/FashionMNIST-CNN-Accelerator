@@ -18,7 +18,7 @@ struct tensor_t {
 		size.z = _z;
 	}
 
-	tensor_t(const tensor_t &other) 	{
+	tensor_t(const tensor_t &other) {
 		data = new T[other.size.x * other.size.y * other.size.z];
 		memcpy(
 			this->data,
@@ -28,25 +28,25 @@ struct tensor_t {
 		this->size = other.size;
 	}
 
-	tensor_t<T> operator+(tensor_t<T> &other) 	{
+	tensor_t<T> operator+(tensor_t<T> &other) {
 		tensor_t<T> clone(*this);
 		for (int i = 0; i < other.size.x * other.size.y * other.size.z; i++)
 			clone.data[i] += other.data[i];
 		return clone;
 	}
 
-	tensor_t<T> operator-(tensor_t<T> &other) 	{
+	tensor_t<T> operator-(tensor_t<T> &other) {
 		tensor_t<T> clone(*this);
 		for (int i = 0; i < other.size.x * other.size.y * other.size.z; i++)
 			clone.data[i] -= other.data[i];
 		return clone;
 	}
 
-	T &operator()(int _x, int _y, int _z) 	{
+	T &operator()(int _x, int _y, int _z) {
 		return this->get(_x, _y, _z);
 	}
 
-	T &get(int _x, int _y, int _z) 	{
+	T &get(int _x, int _y, int _z) {
 		assert(_x >= 0 && _y >= 0 && _z >= 0);
 		assert(_x < size.x &&_y < size.y &&_z < size.z);
 
@@ -57,7 +57,7 @@ struct tensor_t {
 		];
 	}
 
-	void copy_from(std::vector<std::vector<std::vector<T>>> data) 	{
+	void copy_from(std::vector<std::vector<std::vector<T>>> data) {
 		int z = data.size();
 		int y = data[0].size();
 		int x = data[0][0].size();
@@ -68,7 +68,7 @@ struct tensor_t {
 					get(i, j, k) = data[k][j][i];
 	}
 
-	~tensor_t() 	{
+	~tensor_t() {
 		delete[] data;
 	}
 };
@@ -78,10 +78,10 @@ static void print_tensor(tensor_t<float> &data) {
 	int my = data.size.y;
 	int mz = data.size.z;
 
-	for (int z = 0; z < mz; z++) 	{
+	for (int z = 0; z < mz; z++) {
 		printf("[Dim%d]\n", z);
-		for (int y = 0; y < my; y++) 		{
-			for (int x = 0; x < mx; x++) 			{
+		for (int y = 0; y < my; y++) {
+			for (int x = 0; x < mx; x++) {
 				printf("%.2f \t", (float) data.get(x, y, z));
 			}
 			printf("\n");
