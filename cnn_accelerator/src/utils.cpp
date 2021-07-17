@@ -1,90 +1,83 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <fstream>
+
 #include "include/utils.h"
 
+using namespace std;
 
-int reverse_int(int i) {
-    unsigned char c1, c2, c3, c4;
-    c1 = i & 255;
-    c2 = (i >> 8) & 255;
-    c3 = (i >> 16) & 255;
-    c4 = (i >> 24) & 255;
-    return ((int) c1 << 24) + ((int) c2 << 16) + ((int) c3 << 8) + c4;
+uint32_t byteswap_uint32(uint32_t a) {
+    return ((((a >> 24) & 0xff) << 0) |
+        (((a >> 16) & 0xff) << 8) |
+        (((a >> 8) & 0xff) << 16) |
+        (((a >> 0) & 0xff) << 24));
 }
 
-uint8_t*** read_mnist(const char* filepath) {
-    FILE* fp;
-    fp = fopen(filepath, "rb");
-    if (!fp) {
-        perror("Failed to open MNIST file. Exiting..");
-        exit(1);
+uint8_t *read_file(const char *szFile) {
+    ifstream file(szFile, ios::binary | ios::ate);
+    streamsize size = file.tellg();
+    file.seekg(0, ios::beg);
+
+    if (size == -1) {
+        return nullptr;
     }
 
-    int magic_number = 0;
-    int n_images = 0;
-    int n_rows = 0;
-    int n_cols = 0;
-
-    // Magic num
-    size_t ret = fread(&magic_number, sizeof(magic_number), 1, fp);
-    if (ret != sizeof(magic_number)) {
-        perror("Magic num\n");
-        exit(1);
-    }
-    magic_number = reverse_int(magic_number);
-
-    // num images
-    ret = fread(&n_images, sizeof(n_images), 1, fp);
-    if (ret != sizeof(n_images)) {
-        perror("n_images\n");
-        exit(1);
-    }
-    n_images = reverse_int(n_images);
-
-    // num rows
-    ret = fread(&n_rows, sizeof(n_rows), 1, fp);
-    if (ret != sizeof(n_rows)) {
-        perror("n_rows\n");
-        exit(1);
-    }
-    n_rows = reverse_int(n_rows);
-
-    // num cols
-    ret = fread(&n_cols, sizeof(n_cols), 1, fp);
-    if (ret != sizeof(n_cols)) {
-        perror("n_cols\n");
-        exit(1);
-    }
-    n_cols = reverse_int(n_cols);
-
-    uint8_t*** buffer;
-    buffer = (uint8_t***) malloc(sizeof(uint8_t**) * n_images);
-    for (int i = 0; i < n_images; i++) {
-        buffer[i] = (uint8_t**) malloc(sizeof(uint8_t*) * n_rows);
-        for (int r = 0; r < n_rows; r++) {
-            buffer[i][r] = (uint8_t*) malloc(sizeof(uint8_t) * n_cols);
-            for (int c = 0; c < n_cols; c++) {
-                ret = fread(&buffer[i][r][c], sizeof(uint8_t), 1, fp);
-                if (ret != sizeof(uint8_t)) {
-                    perror("bytes\n");
-                    exit(1);
-                }
-            }
-        }
-    }
-
-    fclose(fp);
+    uint8_t *buffer = new uint8_t[size];
+    file.read((char *) buffer, size);
     return buffer;
 }
 
-void read_test_cases() {
-    uint8_t*** train_images = read_mnist("data/Fasion/train-images-idx3-ubyte");
-    uint8_t*** train_labels = read_mnist("data/Fasion/train-labels-idx1-ubyte");
+cases_t read_test_cases() {
+    cases_t cases;
+    uint8_t *test_image = read_file("../data/Fashion/train-images-idx3-ubyte");
+    uint8_t *test_labels = read_file("../data/Fashion/train-labels-idx1-ubyte");
+    cases.case_count = byteswap_uint32(*(uint32_t *) (test_image + 4));
+    cases.c_data = (case_t *) malloc(cases.case_count * sizeof(case_t));
 
-    // uint32_t case_count = byteswap_uint32(*(uint32_t*) (train_image + 4));
+    for (int c = 0; c < cases.case_count; c++) {
+        /* malloc space for image data */
+        cases.c_data[c].img = (float **) malloc(28 * sizeof(float *));
+        for (int i = 0; i < 28; i++) {
+            cases.c_data[c].img[i] = (float *) malloc(28 * sizeof(float));
+        }
 
-    // for (int i = 0; u < case_count; i++) {}
-    printf("All good!\n");
-    free(train_images);
-    free(train_labels);
+        /* malloc space for output data */
+        cases.c_data[c].output = (float *) malloc(10 * sizeof(float));
+
+        /* Pointer to image and label data */
+        uint8_t *img = test_image + 16 + c * (28 * 28);
+        uint8_t *label = test_labels + 8 + c;
+
+        for (int x = 0; x < 28; x++) {
+            for (int y = 0; y < 28; y++) {
+                cases.c_data[c].img[x][y] = img[x + y * 28] / 255.f;
+            }
+        }
+
+        for (int b = 0; b < 10; b++) {
+            cases.c_data[c].output[b] = *label == b ? 1.0f : 0.0f;
+        }
+
+    }
+    delete[] test_image;
+    delete[] test_labels;
+
+    return cases;
+}
+
+
+void free_test_cases(cases_t cases) {
+    /* For each case, free images and outputs */
+    for (int c = 0; c < cases.case_count; c++) {
+        case_t curr_case = cases.c_data[c];
+
+        /* Free image of a case */
+        for (int i = 0; i < 28; i++) {
+            free(curr_case.img[i]);
+        }
+        free(curr_case.img);
+
+        /* Free output of a case */
+        free(curr_case.output);
+    }
 }
