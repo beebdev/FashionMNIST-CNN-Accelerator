@@ -224,5 +224,8 @@ exapmle2
 getParameters
 weights.txt
 
+## cnn_classification
+fashionMNIST
+
 # End of https://www.toptal.com/developers/gitignore/api/c++,c,python
 {"mode":"full","isActive":false}
