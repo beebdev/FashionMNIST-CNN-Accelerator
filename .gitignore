@@ -222,6 +222,7 @@ cython_debug/
 example1
 exapmle2
 getParameters
+weights.txt
 
 # End of https://www.toptal.com/developers/gitignore/api/c++,c,python
 {"mode":"full","isActive":false}

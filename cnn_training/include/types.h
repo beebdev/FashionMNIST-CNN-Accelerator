@@ -1,7 +1,6 @@
 #pragma once
 
-enum class layer_type
-{
+enum class layer_type {
 	conv,
 	fc,
 	relu,

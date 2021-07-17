@@ -10,7 +10,7 @@
 
 using namespace std;
 
-float train(vector<layer_t*>& layers, tensor_t<float>& data, tensor_t<float>& expected) {
+float train(vector<layer_t *> &layers, tensor_t<float> &data, tensor_t<float> &expected) {
 	for (int i = 0; i < layers.size(); i++) {
 		if (i == 0) {
 			activate(layers[i], data);
@@ -42,7 +42,7 @@ float train(vector<layer_t*>& layers, tensor_t<float>& data, tensor_t<float>& ex
 	return err * 100;
 }
 
-void forward(vector<layer_t*>& layers, tensor_t<float>& data) {
+void forward(vector<layer_t *> &layers, tensor_t<float> &data) {
 	for (int i = 0; i < layers.size(); i++) {
 		if (i == 0) {
 			activate(layers[i], data);
@@ -57,7 +57,7 @@ struct case_t {
 	tensor_t<float> out;
 };
 
-uint8_t* read_file(const char* szFile) {
+uint8_t *read_file(const char *szFile) {
 	ifstream file(szFile, ios::binary | ios::ate);
 	streamsize size = file.tellg();
 	file.seekg(0, ios::beg);
@@ -66,24 +66,24 @@ uint8_t* read_file(const char* szFile) {
 		return nullptr;
 	}
 
-	uint8_t* buffer = new uint8_t[size];
-	file.read((char*) buffer, size);
+	uint8_t *buffer = new uint8_t[size];
+	file.read((char *) buffer, size);
 	return buffer;
 }
 
 vector<case_t> read_test_cases() {
 	vector<case_t> cases;
 
-	uint8_t* train_image = read_file("data/Fashion/train-images-idx3-ubyte");
-	uint8_t* train_labels = read_file("data/Fashion/train-labels-idx1-ubyte");
+	uint8_t *train_image = read_file("data/Fashion/train-images-idx3-ubyte");
+	uint8_t *train_labels = read_file("data/Fashion/train-labels-idx1-ubyte");
 
-	uint32_t case_count = byteswap_uint32(*(uint32_t*) (train_image + 4));
+	uint32_t case_count = byteswap_uint32(*(uint32_t *) (train_image + 4));
 
 	for (int i = 0; i < case_count; i++) {
-		case_t c{ tensor_t<float>(28, 28, 1), tensor_t<float>(10, 1, 1) };
+		case_t c{tensor_t<float>(28, 28, 1), tensor_t<float>(10, 1, 1)};
 
-		uint8_t* img = train_image + 16 + i * (28 * 28);
-		uint8_t* label = train_labels + 8 + i;
+		uint8_t *img = train_image + 16 + i * (28 * 28);
+		uint8_t *label = train_labels + 8 + i;
 
 		for (int x = 0; x < 28; x++)
 			for (int y = 0; y < 28; y++)
@@ -106,15 +106,15 @@ int main() {
 	cout << "Read data OK" << endl;
 
 	/* Setup layers for model */
-	vector<layer_t*> layers;
-	conv_layer_t* layer1 = new conv_layer_t(1, 5, 8, cases[0].data.size); // 28 * 28 * 1 -> 24 * 24 * 8
-	relu_layer_t* layer2 = new relu_layer_t(layer1->out.size);
-	pool_layer_t* layer3 = new pool_layer_t(2, 2, layer2->out.size); // 24 * 24 * 8 -> 12 * 12 * 8
-	fc_layer_t* layer4 = new fc_layer_t(layer3->out.size, 10);		 // 4 * 4 * 16 -> 10
-	layers.push_back((layer_t*) layer1);
-	layers.push_back((layer_t*) layer2);
-	layers.push_back((layer_t*) layer3);
-	layers.push_back((layer_t*) layer4);
+	vector<layer_t *> layers;
+	conv_layer_t *layer1 = new conv_layer_t(1, 5, 8, cases[0].data.size); // 28 * 28 * 1 -> 24 * 24 * 8
+	relu_layer_t *layer2 = new relu_layer_t(layer1->out.size);
+	pool_layer_t *layer3 = new pool_layer_t(2, 2, layer2->out.size); // 24 * 24 * 8 -> 12 * 12 * 8
+	fc_layer_t *layer4 = new fc_layer_t(layer3->out.size, 10);		 // 4 * 4 * 16 -> 10
+	layers.push_back((layer_t *) layer1);
+	layers.push_back((layer_t *) layer2);
+	layers.push_back((layer_t *) layer3);
+	layers.push_back((layer_t *) layer4);
 	cout << "Layers OK" << endl;
 
 	/* Start training */
@@ -125,7 +125,7 @@ int main() {
 	int ic = 0;
 	float amse = 0;
 	for (long ep = 0; ep < 200000;) {
-		for (case_t& t : cases) {
+		for (case_t &t : cases) {
 			float xerr = train(layers, t.data, t.out);
 			amse += xerr;
 			ep++;
@@ -143,11 +143,11 @@ int main() {
 
 
 	// while (true) {
-	uint8_t* data = read_file("test.ppm");
+	uint8_t *data = read_file("test.ppm");
 
 	if (data) {
-		uint8_t* usable = data;
-		while (*(uint32_t*) usable != 0x0A353532) {
+		uint8_t *usable = data;
+		while (*(uint32_t *) usable != 0x0A353532) {
 			usable++;
 		}
 
@@ -157,7 +157,7 @@ int main() {
 		};
 #pragma pack(pop)
 
-		RGB* rgb = (RGB*) usable;
+		RGB *rgb = (RGB *) usable;
 
 		tensor_t<float> image(28, 28, 1);
 		for (int i = 0; i < 28; i++) {
@@ -168,7 +168,7 @@ int main() {
 		}
 
 		forward(layers, image);
-		tensor_t<float>& out = layers.back()->out;
+		tensor_t<float> &out = layers.back()->out;
 		for (int i = 0; i < 10; i++) {
 			printf("[%i] %f\n", i, out(i, 0, 0) * 100.0f);
 		}
