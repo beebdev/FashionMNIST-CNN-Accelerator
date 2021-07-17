@@ -1,0 +1,1 @@
+// Would include training parameters generated from cnn_training
