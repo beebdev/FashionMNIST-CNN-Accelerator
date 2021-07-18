@@ -9,15 +9,21 @@ extfilters = 0
 
 # Functions
 
+# Write #include to weights.h
+
 
 def write_include(sink, library):
     str = "#include <" + library + ">\n"
     sink.write(str)
 
+# Write constant definition to weights.h
+
 
 def write_define(sink, label, value):
     str = "#define " + label + " " + value + "\n"
     sink.write(str)
+
+# Write newline to weights.h
 
 
 def write_newline(sink, nlines):
