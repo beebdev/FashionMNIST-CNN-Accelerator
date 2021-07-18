@@ -1,16 +1,95 @@
 
-from os import setgroups
-
-
 src_filename = "weights.txt"
-sink_filename = "../cnn_accelerator/include/weights.h"
+# sink_filename = "../cnn_classification/include/weights.h"
+sink_filename = "weights.h"
 
-with open(src_filename, "r") as src, open(sink_filename, "w") as sink:
+# Values
+filtersize = 0
+extfilters = 0
+
+# Functions
+
+
+def write_include(sink, library):
+    str = "#include <" + library + ">\n"
+    sink.write(str)
+
+
+def write_define(sink, label, value):
+    str = "#define " + label + " " + value + "\n"
+    sink.write(str)
+
+
+def write_newline(sink, nlines):
+    for i in range(0, nlines):
+        sink.write("\n")
+
+
+def write_comment(sink, msg):
+    sink.write("// " + msg + "\n")
+
+
+def generate_conv(sink):
+    write_comment(sink, "CONV constants")
+    write_define(sink, "CONV_STRIDE", "1")
+    write_define(sink, "CONV_FILTERSIZE", filtersize)
+    write_define(sink, "CONV_EXTFILTSIZE", extfilters)
+    write_define(sink, "CONV_IN_DIM", "28")
+    write_define(sink, "CONV_OUT_XY",
+                 "(CONV_IN_DIM - CONV_EXTFILTSIZE) / CONV_STRIDE + 1")
+    write_define(sink, "CONV_OUT_Z", "(CONV_FILTERSIZE)")
+    write_newline(sink, 2)
+
+    write_comment(sink, "CONV weights")
+    sink.write(
+        "float conv_filter[CONV_FILTERSIZE][CONV_EXTFILTSIZE][CONV_EXTFILTSIZE] = {\n")
+    for f in conv:
+        # Each filter
+        sink.write("\t{\n")
+        for i in f:
+            sink.write("\t\t{")
+            for j in i:
+                sink.write(j+", ")
+            sink.write("},\n")
+        sink.write("\t},\n")
+    sink.write("}")
+
+
+def generate_fc(sink):
+    # write_comment(sink, "FC constants")
+    # write_define(sink, "FC_STRIDE", "1")
+    # write_define(sink, "FC_FILTERSIZE", filtersize)
+    # write_define(sink, "FC_EXTFILTSIZE", extfilters)
+    # write_define(sink, "CONV_IN_DIM", "28")
+    # write_define(sink, "CONV_OUT_XY",
+    #              "(CONV_IN_DIM - CONV_EXTFILTSIZE) / CONV_STRIDE + 1")
+    # write_define(sink, "CONV_OUT_Z", "(CONV_FILTERSIZE)")
+    # write_newline(sink, 2)
+
+    # write_comment(sink, "CONV weights")
+    # sink.write(
+    #     "float conv_filter[CONV_FILTERSIZE][CONV_EXTFILTSIZE][CONV_EXTFILTSIZE] = {\n")
+    # for f in conv:
+    #     # Each filter
+    #     sink.write("\t{\n")
+    #     for i in f:
+    #         sink.write("\t\t{")
+    #         for j in i:
+    #             sink.write(j+", ")
+    #         sink.write("},\n")
+    #     sink.write("\t},\n")
+    # sink.write("}")
+
+
+    # Extract weights
+with open(src_filename, "r") as src:
     state = None
     for line in src:
         if "CONV start" in line:
             state = "CONV"
             cols = line.split(" ")
+            filtersize = cols[2]
+            extfilters = cols[3]
             conv = []
             conv_filter = []
         elif "FC start" in line:
@@ -22,6 +101,7 @@ with open(src_filename, "r") as src, open(sink_filename, "w") as sink:
         elif "=" in line:
             if state == "CONV":
                 conv.append(conv_filter)
+                conv_filter = []
         else:
             cols = line.split(" ")
             if state == "CONV":
@@ -29,6 +109,11 @@ with open(src_filename, "r") as src, open(sink_filename, "w") as sink:
             elif state == "FC":
                 fc.append(cols[:-1])
     src.close()
-    sink.close()
     print(conv)
-    print(fc)
+    # print(fc)
+
+# Generate weights.h
+with open(sink_filename, "w") as sink:
+    generate_conv(sink)
+
+    sink.close()
