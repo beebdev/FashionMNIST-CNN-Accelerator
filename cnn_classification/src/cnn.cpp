@@ -39,9 +39,28 @@ void relu_layer() {
     // TODO: implement me
 }
 
-
-void pool_layer() {
+/* Pool_layer
+ * din: 2D array of 24 * 24
+ * dout: 3D array of 12 * 12 * 8 */
+void pool_layer(float ***din, float ***dout) {
     // TODO: implement me
+    for (int x = 0; x < POOL_OUT_XY; x++) {
+        for (int y = 0; y < POOL_OUT_XY; y++) {
+            for (int z = 0; z < POOL_OUT_Z; z++) {
+                float mval = -FLT_MAX;
+                int stride_x = x * POOL_STRIDE;
+                int stride_y = y * POOL_STRIDE;
+                for (int i = 0; i < POOL_EXTFILTSIZE; ++i) {
+                    for (int j = 0; j < POOL_EXTFILTSIZE; ++j) {
+                        float temp = din[stride_x + i][stride_y + j][z];
+                        if (temp > mval)
+                            mval = temp;
+                    }
+                }
+                dout[x][y][z] = mval;
+            }
+        }
+    }
 }
 
 
