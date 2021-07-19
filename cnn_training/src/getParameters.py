@@ -58,35 +58,38 @@ def generate_conv(sink):
                 sink.write(j+", ")
             sink.write("},\n")
         sink.write("\t},\n")
-    sink.write("}")
+    sink.write("};\n")
 
 
 def generate_fc(sink):
-    # write_comment(sink, "FC constants")
-    # write_define(sink, "FC_STRIDE", "1")
-    # write_define(sink, "FC_FILTERSIZE", filtersize)
-    # write_define(sink, "FC_EXTFILTSIZE", extfilters)
-    # write_define(sink, "CONV_IN_DIM", "28")
-    # write_define(sink, "CONV_OUT_XY",
-    #              "(CONV_IN_DIM - CONV_EXTFILTSIZE) / CONV_STRIDE + 1")
-    # write_define(sink, "CONV_OUT_Z", "(CONV_FILTERSIZE)")
-    # write_newline(sink, 2)
+    write_comment(sink, "FC constants")
+    write_define(sink, "FC_IN_DIM", "1152")
+    write_define(sink, "FC_OUT", "10")
+    write_define(sink, "FC_IN_X", "12")
+    write_define(sink, "FC_IN_Y", "12")
+    write_define(sink, "FC_IN_Z", "8")
+    write_comment(sink, "FC weights")
+    sink.write(
+        "float fc_inputs[FC_OUT];\n")
+    sink.write(
+        "float fc_weights[FC_IN_DIM][FC_OUT] = {\n")
+    for f in fc:
+        # Each filter
+        sink.write("\t{")
+        for j in f:
+            sink.write(j+", ")
+        sink.write("},\n")
+    sink.write("};")
 
-    # write_comment(sink, "CONV weights")
-    # sink.write(
-    #     "float conv_filter[CONV_FILTERSIZE][CONV_EXTFILTSIZE][CONV_EXTFILTSIZE] = {\n")
-    # for f in conv:
-    #     # Each filter
-    #     sink.write("\t{\n")
-    #     for i in f:
-    #         sink.write("\t\t{")
-    #         for j in i:
-    #             sink.write(j+", ")
-    #         sink.write("},\n")
-    #     sink.write("\t},\n")
-    # sink.write("}")
-
-
+def generate_pool(sink):
+    write_comment(sink,"POOL constants")
+    write_define(sink, "POOL_STRIDE", "2")
+    write_define(sink, "POOL_EXTFILTSIZE", "2")
+    write_define(sink, "POOL_IN_DIM", "24")
+    write_define(sink, "POOL_IN_CHANNEL", "(CONV_OUT_Z)")
+    write_define(sink, "POOL_OUT_XY", "(POOL_IN_DIM - POOL_EXTFILTSIZE) / POOL_STRIDE + 1")
+    write_define(sink,"POOL_OUT_Z","(POOL_IN_CHANNEL)")
+    
     # Extract weights
 with open(src_filename, "r") as src:
     state = None
@@ -115,11 +118,12 @@ with open(src_filename, "r") as src:
             elif state == "FC":
                 fc.append(cols[:-1])
     src.close()
-    print(conv)
+    # print(conv)
     # print(fc)
 
 # Generate weights.h
 with open(sink_filename, "w") as sink:
     generate_conv(sink)
-
+    generate_pool(sink)
+    generate_fc(sink)
     sink.close()
