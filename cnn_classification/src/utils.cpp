@@ -28,6 +28,8 @@ uint8_t *read_file(const char *szFile) {
 }
 
 cases_t read_test_cases() {
+    printf("Reading test cases...");
+
     cases_t cases;
     uint8_t *test_image = read_file("../data/Fashion/train-images-idx3-ubyte");
     uint8_t *test_labels = read_file("../data/Fashion/train-labels-idx1-ubyte");
@@ -61,7 +63,7 @@ cases_t read_test_cases() {
     }
     delete[] test_image;
     delete[] test_labels;
-
+    printf("Done\n");
     return cases;
 }
 

@@ -87,11 +87,11 @@ def conv_weights(sink):
 def fc_weights(sink):
     write_comment(sink, "FC weights")
     sink.write(
-        "float fc_filter[FC_WEIGHTS_X][FC_WEIGHTS_Y] = {\n")
+        "float fc_weights[FC_WEIGHTS_X][FC_WEIGHTS_Y] = {\n\t")
     for cnt, w in enumerate(fc):
         sink.write(w + ", ")
         if (cnt+1) % 10 == 0:
-            sink.write("\n")
+            sink.write("\n\t")
     sink.write("};")
 
     # Extract weights
