@@ -19,7 +19,7 @@ https://www.notion.so/FasionMNIST-CNN-Accelerator-978da2b835f0482b9ddab8841dcc02
 
 ## Quick start
 ### Weight training and extraction
-Since we only want to accelerate the classification process, we have a seperate program for training the mdoel and saving the trained parameters to a ```weights.txt``` file. The ```getParameters.py``` script will scrap the trained weights and produce a ```weights.h``` header file saved in the ```cnn_accelerator/include```. This will be compiled to the classification program.
+Since we only want to accelerate the classification process, we have a seperate program for training the model and saving the trained parameters to a ```weights.txt``` file. The ```getParameters.py``` script will scrap the trained weights and produce a ```weights.h``` header file saved in the ```cnn_accelerator/include```. This will be compiled to the classification program.
 ```bash
 cd path/to/FashionMNIST-CNN-Accelerator/
 cd cnn_training

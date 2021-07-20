@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <float.h>
 
 void cnn(float **img, float *result);
 void conv_layer();
