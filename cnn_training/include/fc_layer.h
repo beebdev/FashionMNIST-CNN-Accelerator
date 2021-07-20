@@ -62,7 +62,7 @@ struct fc_layer_t {
 			for (int i = 0; i < in.size.x; i++) {
 				for (int j = 0; j < in.size.y; j++) {
 					for (int z = 0; z < in.size.z; z++) {
-						int m = map({i, j, z});
+						int m = map({ i, j, z });
 						inputv += in(i, j, z) * weights(m, n, 0);
 					}
 				}
@@ -79,7 +79,7 @@ struct fc_layer_t {
 			for (int i = 0; i < in.size.x; i++)
 				for (int j = 0; j < in.size.y; j++)
 					for (int z = 0; z < in.size.z; z++) {
-						int m = map({i, j, z});
+						int m = map({ i, j, z });
 						float &w = weights(m, n, 0);
 						w = update_weight(w, grad, in(i, j, z));
 					}
@@ -97,7 +97,7 @@ struct fc_layer_t {
 			for (int i = 0; i < in.size.x; i++)
 				for (int j = 0; j < in.size.y; j++)
 					for (int z = 0; z < in.size.z; z++) {
-						int m = map({i, j, z});
+						int m = map({ i, j, z });
 						grads_in(i, j, z) += grad.grad * weights(m, n, 0);
 					}
 		}
@@ -105,15 +105,20 @@ struct fc_layer_t {
 
 	void save_weights(std::ofstream &outfile) {
 		int height = in.size.x * in.size.y * in.size.z;
-		outfile << "FC start " << height << " " << out.size.x << std::endl;
+		outfile << "FC ";
+		outfile << in.size.x << " ";			// in.size.x
+		outfile << in.size.y << " ";			// in.size.y
+		outfile << in.size.z << " ";			// in.size.z
+		outfile << height << " ";				// weights.size.x
+		outfile << out.size.x << std::endl;		// out.size
 
+		/* Weights */
 		for (int h = 0; h < height; h++) {
 			for (int i = 0; i < out.size.x; i++) {
 				outfile << weights(h, i, 0) << " ";
 			}
 			outfile << std::endl;
 		}
-		outfile << "FC end" << std::endl;
 	}
 };
 #pragma pack(pop)

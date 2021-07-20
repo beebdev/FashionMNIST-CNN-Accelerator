@@ -119,8 +119,15 @@ struct pool_layer_t {
 	}
 
 	void save_weights(std::ofstream &outfile) {
-		// No weights for max pooling
-		return;
+		outfile << "POOL ";
+		outfile << in.size.x << " ";
+		outfile << in.size.y << " ";
+		outfile << in.size.z << " ";
+		outfile << out.size.x << " ";
+		outfile << out.size.y << " ";
+		outfile << out.size.z << " ";
+		outfile << stride << " ";
+		outfile << extend_filter << std::endl;
 	}
 };
 #pragma pack(pop)

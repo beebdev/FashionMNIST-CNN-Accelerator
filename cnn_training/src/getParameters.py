@@ -1,32 +1,27 @@
 
 src_filename = "weights.txt"
-# sink_filename = "../cnn_classification/include/weights.h"
-sink_filename = "weights.h"
+sink_filename = "../cnn_classification/include/weights.h"
+# sink_filename = "weights.h"
 
 # Values
 filtersize = 0
 extfilters = 0
 
-# Functions
-
-# Write #include to weights.h
-
 
 def write_include(sink, library):
+    # Write #include to weights.h
     str = "#include <" + library + ">\n"
     sink.write(str)
 
-# Write constant definition to weights.h
-
 
 def write_define(sink, label, value):
+    # Write constant definition to weights.h
     str = "#define " + label + " " + value + "\n"
     sink.write(str)
 
-# Write newline to weights.h
-
 
 def write_newline(sink, nlines):
+    # Write newline to weights.h
     for i in range(0, nlines):
         sink.write("\n")
 
@@ -35,91 +30,123 @@ def write_comment(sink, msg):
     sink.write("// " + msg + "\n")
 
 
-def generate_conv(sink):
-    write_comment(sink, "CONV constants")
-    write_define(sink, "CONV_STRIDE", "1")
-    write_define(sink, "CONV_FILTERSIZE", filtersize)
-    write_define(sink, "CONV_EXTFILTSIZE", extfilters)
-    write_define(sink, "CONV_IN_DIM", "28")
-    write_define(sink, "CONV_OUT_XY",
-                 "(CONV_IN_DIM - CONV_EXTFILTSIZE) / CONV_STRIDE + 1")
-    write_define(sink, "CONV_OUT_Z", "(CONV_FILTERSIZE)")
-    write_newline(sink, 2)
+def conv_defines(sink):
+    write_comment(sink, "CONV layer constants")
+    write_define(sink, "CONV_IN_DIM_X", conv_in_x)
+    write_define(sink, "CONV_IN_DIM_Y", conv_in_y)
+    write_define(sink, "CONV_IN_DIM_Z", conv_in_z)
+    write_define(sink, "CONV_OUT_DIM_X", conv_out_x)
+    write_define(sink, "CONV_OUT_DIM_Y", conv_out_y)
+    write_define(sink, "CONV_OUT_DIM_Z", conv_out_z)
+    write_define(sink, "CONV_NFILTERS", conv_out_z)
+    write_define(sink, "CONV_STRIDE", conv_stride)
+    write_define(sink, "CONV_EXTFILTER", conv_extfilter)
 
+
+def relu_defines(sink):
+    write_comment(sink, "RELU layer constants")
+    write_define(sink, "RELU_DIM_X", relu_x)
+    write_define(sink, "RELU_DIM_Y", relu_y)
+    write_define(sink, "RELU_DIM_Z", relu_z)
+
+
+def pool_defines(sink):
+    write_comment(sink, "POOL layer constants")
+    write_define(sink, "POOL_IN_DIM_X", pool_in_x)
+    write_define(sink, "POOL_IN_DIM_Y", pool_in_y)
+    write_define(sink, "POOL_IN_DIM_Z", pool_in_z)
+    write_define(sink, "POOL_OUT_DIM_X", pool_out_x)
+    write_define(sink, "POOL_OUT_DIM_Y", pool_out_y)
+    write_define(sink, "POOL_OUT_DIM_Z", pool_out_z)
+    write_define(sink, "POOL_STRIDE", pool_stride)
+    write_define(sink, "POOL_EXTFILTER", pool_extfilter)
+
+
+def fc_defines(sink):
+    write_comment(sink, "FC layer constants")
+    write_define(sink, "FC_IN_DIM_X", fc_in_x)
+    write_define(sink, "FC_IN_DIM_Y", fc_in_y)
+    write_define(sink, "FC_IN_DIM_Z", fc_in_z)
+    write_define(sink, "FC_OUT_DIM_X", fc_out_x)
+    write_define(sink, "FC_WEIGHTS_X", fc_w_x)
+    write_define(sink, "FC_WEIGHTS_Y", fc_out_x)
+
+
+def conv_weights(sink):
     write_comment(sink, "CONV weights")
     sink.write(
-        "float conv_filter[CONV_FILTERSIZE][CONV_EXTFILTSIZE][CONV_EXTFILTSIZE] = {\n")
-    for f in conv:
-        # Each filter
-        sink.write("\t{\n")
-        for i in f:
-            sink.write("\t\t{")
-            for j in i:
-                sink.write(j+", ")
-            sink.write("},\n")
-        sink.write("\t},\n")
-    sink.write("}")
+        "float conv_filter[CONV_NFILTERS][CONV_EXTFILTER][CONV_EXTFILTER] = {\n\t")
+    for cnt, w in enumerate(conv):
+        sink.write(w + ", ")
+        if (cnt+1) % 10 == 0:
+            sink.write("\n\t")
+    sink.write("};")
+    write_newline(sink, 2)
 
 
-def generate_fc(sink):
-    # write_comment(sink, "FC constants")
-    # write_define(sink, "FC_STRIDE", "1")
-    # write_define(sink, "FC_FILTERSIZE", filtersize)
-    # write_define(sink, "FC_EXTFILTSIZE", extfilters)
-    # write_define(sink, "CONV_IN_DIM", "28")
-    # write_define(sink, "CONV_OUT_XY",
-    #              "(CONV_IN_DIM - CONV_EXTFILTSIZE) / CONV_STRIDE + 1")
-    # write_define(sink, "CONV_OUT_Z", "(CONV_FILTERSIZE)")
-    # write_newline(sink, 2)
-
-    # write_comment(sink, "CONV weights")
-    # sink.write(
-    #     "float conv_filter[CONV_FILTERSIZE][CONV_EXTFILTSIZE][CONV_EXTFILTSIZE] = {\n")
-    # for f in conv:
-    #     # Each filter
-    #     sink.write("\t{\n")
-    #     for i in f:
-    #         sink.write("\t\t{")
-    #         for j in i:
-    #             sink.write(j+", ")
-    #         sink.write("},\n")
-    #     sink.write("\t},\n")
-    # sink.write("}")
-
+def fc_weights(sink):
+    write_comment(sink, "FC weights")
+    sink.write(
+        "float fc_filter[FC_WEIGHTS_X][FC_WEIGHTS_Y] = {\n")
+    for cnt, w in enumerate(fc):
+        sink.write(w + ", ")
+        if (cnt+1) % 10 == 0:
+            sink.write("\n")
+    sink.write("};")
 
     # Extract weights
 with open(src_filename, "r") as src:
     state = None
     for line in src:
-        if "CONV start" in line:
+        cols = line.split(" ")
+        if "CONV" in line:
             state = "CONV"
-            cols = line.split(" ")
-            filtersize = cols[2]
-            extfilters = cols[3]
+            conv_in_x = (cols[1])
+            conv_in_y = (cols[2])
+            conv_in_z = (cols[3])
+            conv_out_x = (cols[4])
+            conv_out_y = (cols[5])
+            conv_out_z = (cols[6])
+            conv_stride = (cols[7])
+            conv_extfilter = (cols[8])
             conv = []
-            conv_filter = []
-        elif "FC start" in line:
+        elif "RELU" in line:
+            state = "RELU"
+            relu_x = (cols[1])
+            relu_y = (cols[2])
+            relu_z = (cols[3])
+        elif "POOL" in line:
+            state = "POOL"
+            pool_in_x = (cols[1])
+            pool_in_y = (cols[2])
+            pool_in_z = (cols[3])
+            pool_out_x = (cols[4])
+            pool_out_y = (cols[5])
+            pool_out_z = (cols[6])
+            pool_stride = (cols[7])
+            pool_extfilter = (cols[8])
+        elif "FC" in line:
             state = "FC"
-            cols = line.split(" ")
+            fc_in_x = (cols[1])
+            fc_in_y = (cols[2])
+            fc_in_z = (cols[3])
+            fc_w_x = (cols[4])
+            fc_out_x = (cols[5])
             fc = []
-        elif "end" in line:
-            state = None
-        elif "=" in line:
-            if state == "CONV":
-                conv.append(conv_filter)
-                conv_filter = []
         else:
-            cols = line.split(" ")
             if state == "CONV":
-                conv_filter.append(cols[:-1])
+                conv += cols[:-1]
             elif state == "FC":
-                fc.append(cols[:-1])
+                fc += cols[:-1]
     src.close()
-    print(conv)
-    # print(fc)
 
 # Generate weights.h
 with open(sink_filename, "w") as sink:
-    generate_conv(sink)
-
+    write_comment(sink, "This header is autogenerated")
+    conv_defines(sink)
+    relu_defines(sink)
+    pool_defines(sink)
+    fc_defines(sink)
+    conv_weights(sink)
+    fc_weights(sink)
     sink.close()

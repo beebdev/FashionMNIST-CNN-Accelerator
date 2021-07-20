@@ -48,8 +48,10 @@ struct relu_layer_t {
 	}
 
 	void save_weights(std::ofstream &outfile) {
-		// No weights for relu
-		return;
+		outfile << "RELU ";
+		outfile << in.size.x << " ";
+		outfile << in.size.y << " ";
+		outfile << in.size.z << std::endl;
 	}
 };
 #pragma pack(pop)

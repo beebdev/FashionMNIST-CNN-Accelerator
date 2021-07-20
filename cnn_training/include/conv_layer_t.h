@@ -98,7 +98,7 @@ struct conv_layer_t {
 			tensor_t<float> &filter_data = filters[filter];
 			for (int x = 0; x < out.size.x; x++) {
 				for (int y = 0; y < out.size.y; y++) {
-					point_t mapped = map_to_input({(uint16_t) x, (uint16_t) y, 0}, 0);
+					point_t mapped = map_to_input({ (uint16_t) x, (uint16_t) y, 0 }, 0);
 					float sum = 0;
 					for (int i = 0; i < extend_filter; i++)
 						for (int j = 0; j < extend_filter; j++)
@@ -157,11 +157,18 @@ struct conv_layer_t {
 	}
 
 	void save_weights(std::ofstream &outfile) {
-		outfile << "CONV start ";
-		outfile << filters.size() << " ";
+		// TODO: Save the input/output dimensions to the weights.txt file
+		outfile << "CONV ";
+		outfile << in.size.x << " ";
+		outfile << in.size.y << " ";
 		outfile << in.size.z << " ";
+		outfile << out.size.x << " ";
+		outfile << out.size.y << " ";
+		outfile << out.size.z << " ";
+		outfile << stride << " ";
 		outfile << extend_filter << std::endl;
 
+		/* Weights */
 		for (int filter = 0; filter < filters.size(); filter++) {
 			tensor_t<float> &filter_data = filters[filter];
 			for (int z = 0; z < in.size.z; z++) {
@@ -171,10 +178,8 @@ struct conv_layer_t {
 					}
 					outfile << std::endl;
 				}
-				outfile << "=" << std::endl;
 			}
 		}
-		outfile << "CONV end" << std::endl;
 	}
 };
 

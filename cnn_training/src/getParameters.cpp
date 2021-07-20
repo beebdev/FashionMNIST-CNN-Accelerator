@@ -121,7 +121,7 @@ void model_fit(vector<layer_t *> &layers, vector<case_t> &cases) {
 
     int ic = 0;
     float amse = 0;
-    for (long ep = 0; ep < 100000;) {
+    for (long ep = 0; ep < 300000;) {
         for (case_t &t : cases) {
             float xerr = train(layers, t.data, t.out);
             amse += xerr;
