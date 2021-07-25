@@ -31,8 +31,8 @@ cases_t read_test_cases() {
     printf("Reading test cases...");
 
     cases_t cases;
-    uint8_t* test_image = read_file("../data/Fashion/train-images-idx3-ubyte");
-    uint8_t* test_labels = read_file("../data/Fashion/train-labels-idx1-ubyte");
+    uint8_t* test_image = read_file("../data/Fashion/t10k-images-idx3-ubyte");
+    uint8_t* test_labels = read_file("../data/Fashion/t10k-labels-idx1-ubyte");
     cases.case_count = byteswap_uint32(*(uint32_t*)(test_image + 4));
     cases.c_data = (case_t*)malloc(cases.case_count * sizeof(case_t));
 
