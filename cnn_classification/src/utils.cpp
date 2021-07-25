@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <fstream>
 
-#include "include/utils.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -13,7 +13,7 @@ uint32_t byteswap_uint32(uint32_t a) {
         (((a >> 0) & 0xff) << 24));
 }
 
-uint8_t *read_file(const char *szFile) {
+uint8_t* read_file(const char* szFile) {
     ifstream file(szFile, ios::binary | ios::ate);
     streamsize size = file.tellg();
     file.seekg(0, ios::beg);
@@ -22,8 +22,8 @@ uint8_t *read_file(const char *szFile) {
         return nullptr;
     }
 
-    uint8_t *buffer = new uint8_t[size];
-    file.read((char *) buffer, size);
+    uint8_t* buffer = new uint8_t[size];
+    file.read((char*)buffer, size);
     return buffer;
 }
 
@@ -31,24 +31,24 @@ cases_t read_test_cases() {
     printf("Reading test cases...");
 
     cases_t cases;
-    uint8_t *test_image = read_file("../data/Fashion/train-images-idx3-ubyte");
-    uint8_t *test_labels = read_file("../data/Fashion/train-labels-idx1-ubyte");
-    cases.case_count = byteswap_uint32(*(uint32_t *) (test_image + 4));
-    cases.c_data = (case_t *) malloc(cases.case_count * sizeof(case_t));
+    uint8_t* test_image = read_file("../data/Fashion/train-images-idx3-ubyte");
+    uint8_t* test_labels = read_file("../data/Fashion/train-labels-idx1-ubyte");
+    cases.case_count = byteswap_uint32(*(uint32_t*)(test_image + 4));
+    cases.c_data = (case_t*)malloc(cases.case_count * sizeof(case_t));
 
     for (int c = 0; c < cases.case_count; c++) {
         /* malloc space for image data */
-        cases.c_data[c].img = (float **) malloc(28 * sizeof(float *));
+        cases.c_data[c].img = (float**)malloc(28 * sizeof(float*));
         for (int i = 0; i < 28; i++) {
-            cases.c_data[c].img[i] = (float *) malloc(28 * sizeof(float));
+            cases.c_data[c].img[i] = (float*)malloc(28 * sizeof(float));
         }
 
         /* malloc space for output data */
-        cases.c_data[c].output = (float *) malloc(10 * sizeof(float));
+        cases.c_data[c].output = (float*)malloc(10 * sizeof(float));
 
         /* Pointer to image and label data */
-        uint8_t *img = test_image + 16 + c * (28 * 28);
-        uint8_t *label = test_labels + 8 + c;
+        uint8_t* img = test_image + 16 + c * (28 * 28);
+        uint8_t* label = test_labels + 8 + c;
 
         for (int x = 0; x < 28; x++) {
             for (int y = 0; y < 28; y++) {
@@ -82,4 +82,24 @@ void free_test_cases(cases_t cases) {
         /* Free output of a case */
         free(curr_case.output);
     }
+}
+
+bool max_bin(float* expected, float* obtained) {
+    int expected_category = 0;
+    int obtained_category = 0;
+    float max = -1.0;
+    for (int i = 0; i < 10; i++) {
+        if (expected[i] == 1.0) {
+            expected_category = i;
+        }
+
+        if (obtained[i] > max) {
+            max = obtained[i];
+            obtained_category = i;
+        }
+    }
+    if (expected_category == obtained_category) {
+        return true;
+    }
+    return false;
 }

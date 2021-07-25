@@ -13,7 +13,7 @@
 using namespace std;
 
 /* CNN one epoch of training */
-float train(vector<layer_t *> &layers, tensor_t<float> &data, tensor_t<float> &expected) {
+float train(vector<layer_t*>& layers, tensor_t<float>& data, tensor_t<float>& expected) {
     for (int i = 0; i < layers.size(); i++) {
         if (i == 0) {
             activate(layers[i], data);
@@ -51,7 +51,7 @@ struct case_t {
 };
 
 /* Read single file into a buffer */
-uint8_t *read_file(const char *szFile) {
+uint8_t* read_file(const char* szFile) {
     ifstream file(szFile, ios::binary | ios::ate);
     streamsize size = file.tellg();
     file.seekg(0, ios::beg);
@@ -60,8 +60,8 @@ uint8_t *read_file(const char *szFile) {
         return nullptr;
     }
 
-    uint8_t *buffer = new uint8_t[size];
-    file.read((char *) buffer, size);
+    uint8_t* buffer = new uint8_t[size];
+    file.read((char*)buffer, size);
     return buffer;
 }
 
@@ -69,16 +69,16 @@ uint8_t *read_file(const char *szFile) {
 vector<case_t> read_test_cases() {
     vector<case_t> cases;
 
-    uint8_t *train_image = read_file("../data/Fashion/train-images-idx3-ubyte");
-    uint8_t *train_labels = read_file("../data/Fashion/train-labels-idx1-ubyte");
+    uint8_t* train_image = read_file("../data/Fashion/train-images-idx3-ubyte");
+    uint8_t* train_labels = read_file("../data/Fashion/train-labels-idx1-ubyte");
 
-    uint32_t case_count = byteswap_uint32(*(uint32_t *) (train_image + 4));
+    uint32_t case_count = byteswap_uint32(*(uint32_t*)(train_image + 4));
 
     for (int i = 0; i < case_count; i++) {
         case_t c{ tensor_t<float>(28, 28, 1), tensor_t<float>(10, 1, 1) };
 
-        uint8_t *img = train_image + 16 + i * (28 * 28);
-        uint8_t *label = train_labels + 8 + i;
+        uint8_t* img = train_image + 16 + i * (28 * 28);
+        uint8_t* label = train_labels + 8 + i;
 
         for (int x = 0; x < 28; x++)
             for (int y = 0; y < 28; y++)
@@ -97,32 +97,32 @@ vector<case_t> read_test_cases() {
 
 
 //////////////////////////////
-vector<layer_t *> config_model(vector<case_t> &cases) {
+vector<layer_t*> config_model(vector<case_t>& cases) {
     /* Setup layers for model */
-    vector<layer_t *> layers;
-    conv_layer_t *layer1 = new conv_layer_t(1, 5, 8, cases[0].data.size);   // 28 * 28 * 1 -> 24 * 24 * 8
-    relu_layer_t *layer2 = new relu_layer_t(layer1->out.size);
-    pool_layer_t *layer3 = new pool_layer_t(2, 2, layer2->out.size);        // 24 * 24 * 8 -> 12 * 12 * 8
+    vector<layer_t*> layers;
+    conv_layer_t* layer1 = new conv_layer_t(1, 5, 32, cases[0].data.size);   // 28 * 28 * 1 -> 24 * 24 * 8
+    relu_layer_t* layer2 = new relu_layer_t(layer1->out.size);
+    pool_layer_t* layer3 = new pool_layer_t(2, 2, layer2->out.size);        // 24 * 24 * 8 -> 12 * 12 * 8
     cout << layer3->out.size.x << " ";
     cout << layer3->out.size.y << " ";
     cout << layer3->out.size.z << " " << endl;
-    fc_layer_t *layer4 = new fc_layer_t(layer3->out.size, 10);              // 4 * 4 * 16 -> 10
-    layers.push_back((layer_t *) layer1);
-    layers.push_back((layer_t *) layer2);
-    layers.push_back((layer_t *) layer3);
-    layers.push_back((layer_t *) layer4);
+    fc_layer_t* layer4 = new fc_layer_t(layer3->out.size, 10);              // 4 * 4 * 16 -> 10
+    layers.push_back((layer_t*)layer1);
+    layers.push_back((layer_t*)layer2);
+    layers.push_back((layer_t*)layer3);
+    layers.push_back((layer_t*)layer4);
     return layers;
 }
 
-void model_fit(vector<layer_t *> &layers, vector<case_t> &cases) {
+void model_fit(vector<layer_t*>& layers, vector<case_t>& cases) {
     struct timeval training_t1, training_t2;
     cout << "Training start." << endl;
     gettimeofday(&training_t1, NULL);
 
     int ic = 0;
     float amse = 0;
-    for (long ep = 0; ep < 300000;) {
-        for (case_t &t : cases) {
+    for (long ep = 0; ep < 100000;) {
+        for (case_t& t : cases) {
             float xerr = train(layers, t.data, t.out);
             amse += xerr;
             ep++;
@@ -137,7 +137,7 @@ void model_fit(vector<layer_t *> &layers, vector<case_t> &cases) {
     cout << "Training done. Duration: " << elapsedTime << "sec" << endl;
 }
 
-void save_parameters(vector<layer_t *> &layers, string filepath) {
+void save_parameters(vector<layer_t*>& layers, string filepath) {
     /* Open file */
     ofstream outfile;
     outfile.open(filepath, ios::out | ios::trunc);
@@ -152,9 +152,8 @@ void save_parameters(vector<layer_t *> &layers, string filepath) {
 int main() {
     /* Read test cases */
     vector<case_t> cases = read_test_cases();
-    vector<layer_t *> layers = config_model(cases);
+    vector<layer_t*> layers = config_model(cases);
     model_fit(layers, cases);
-    // model_fit(layers, cases, 1000);
     save_parameters(layers, "weights.txt");
     cout << "getParameters done." << endl;
     return 0;

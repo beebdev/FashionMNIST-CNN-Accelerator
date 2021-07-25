@@ -19,7 +19,7 @@ struct fc_layer_t {
 		: in(in_size.x, in_size.y, in_size.z),
 		out(out_size, 1, 1),
 		grads_in(in_size.x, in_size.y, in_size.z),
-		weights(in_size.x *in_size.y *in_size.z, out_size, 1) {
+		weights(in_size.x* in_size.y* in_size.z, out_size, 1) {
 		input = std::vector<float>(out_size);
 		gradients = std::vector<gradient_t>(out_size);
 
@@ -46,7 +46,7 @@ struct fc_layer_t {
 		return sig * (1 - sig);
 	}
 
-	void activate(tensor_t<float> &in) {
+	void activate(tensor_t<float>& in) {
 		this->in = in;
 		activate();
 	}
@@ -75,12 +75,12 @@ struct fc_layer_t {
 
 	void fix_weights() {
 		for (int n = 0; n < out.size.x; n++) {
-			gradient_t &grad = gradients[n];
+			gradient_t& grad = gradients[n];
 			for (int i = 0; i < in.size.x; i++)
 				for (int j = 0; j < in.size.y; j++)
 					for (int z = 0; z < in.size.z; z++) {
 						int m = map({ i, j, z });
-						float &w = weights(m, n, 0);
+						float& w = weights(m, n, 0);
 						w = update_weight(w, grad, in(i, j, z));
 					}
 
@@ -88,10 +88,10 @@ struct fc_layer_t {
 		}
 	}
 
-	void calc_grads(tensor_t<float> &grad_next_layer) {
+	void calc_grads(tensor_t<float>& grad_next_layer) {
 		memset(grads_in.data, 0, grads_in.size.x * grads_in.size.y * grads_in.size.z * sizeof(float));
 		for (int n = 0; n < out.size.x; n++) {
-			gradient_t &grad = gradients[n];
+			gradient_t& grad = gradients[n];
 			grad.grad = grad_next_layer(n, 0, 0) * activator_derivative(input[n]);
 
 			for (int i = 0; i < in.size.x; i++)
@@ -103,7 +103,7 @@ struct fc_layer_t {
 		}
 	}
 
-	void save_weights(std::ofstream &outfile) {
+	void save_weights(std::ofstream& outfile) {
 		int height = in.size.x * in.size.y * in.size.z;
 		outfile << "FC ";
 		outfile << in.size.x << " ";			// in.size.x
