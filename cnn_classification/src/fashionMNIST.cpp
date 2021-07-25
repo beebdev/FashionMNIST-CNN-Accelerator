@@ -5,26 +5,11 @@
 #include "utils.h"
 #include "cnn.h"
 
-// std::string logo = "\u001b[34;1m╔═╗┌─┐┌─┐┬ ┬┬┌─┐┌┐┌╔═╗╔╗╔╔╗╔  \n\
-// ╠╣ ├─┤└─┐├─┤││ ││││║  ║║║║║║ \n\
-// ╚  ┴ ┴└─┘┴ ┴┴└─┘┘└┘╚═╝╝╚╝╝╚╝ \n\
-// ╔═╗┌─┐┌─┐┌─┐┬  ┌─┐┬─┐┌─┐┌┬┐┌─┐┬─┐ \n\
-// ╠═╣│  │  ├┤ │  ├┤ ├┬┘├─┤ │ │ │├┬┘ \n\
-// ╩ ╩└─┘└─┘└─┘┴─┘└─┘┴└─┴ ┴ ┴ └─┘┴└─\n\u001b[0m";
-
 int main() {
     // std::cout << logo << std::endl;
 
     /* Read test cases */
     cases_t cases = read_test_cases();
-
-    // case_t curr_case = cases.c_data[1];
-    // float results[10];
-    // cnn(curr_case.img, results);
-    // for (int i = 0; i < 10; i++) {
-    //     std::cout << max_bin(curr_case.output, results) << std::endl;
-    // }
-
 
     /* Stats var */
     double total_duration = 0.0;

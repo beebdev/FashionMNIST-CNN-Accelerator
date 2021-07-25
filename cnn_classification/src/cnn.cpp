@@ -5,7 +5,7 @@
 
 
 /* CONV */
-float kernel_conv(float** din, int x, int y, int filter) {
+float kernel_conv(float din[CONV_IN_DIM_X][CONV_IN_DIM_Y], int x, int y, int filter) {
     /* Map x, y */
     int o_x = x * CONV_STRIDE;
     int o_y = y * CONV_STRIDE;
@@ -24,7 +24,7 @@ float kernel_conv(float** din, int x, int y, int filter) {
 /* Conv_layer
  * din: 2D array of 28*28
  * dout: 3D array of */
-void conv_layer(float** din, float dout[CONV_OUT_DIM_X][CONV_OUT_DIM_Y][CONV_OUT_DIM_Z]) {
+void conv_layer(float din[CONV_IN_DIM_X][CONV_IN_DIM_Y], float dout[CONV_OUT_DIM_X][CONV_OUT_DIM_Y][CONV_OUT_DIM_Z]) {
     for (int filter = 0; filter < CONV_NFILTERS; filter++) {
         for (int x = 0; x < CONV_OUT_DIM_X; x++) {
             for (int y = 0; y < CONV_OUT_DIM_Y; y++) {
@@ -76,7 +76,7 @@ void pool_layer(float din[RELU_DIM_X][RELU_DIM_Y][RELU_DIM_Z], float dout[POOL_O
 
 /* FC Helper Function */
 int map(float dz, float dy, float dx) {
-    return dz * (FC_IN_DIM_X * FC_IN_DIM_Y) + dy * (FC_IN_DIM_X)+dx;
+    return dz * (FC_IN_DIM_X * FC_IN_DIM_Y) + dy * (FC_IN_DIM_X) +dx;
 }
 
 float activator_function(float x) {
@@ -89,7 +89,7 @@ float activator_function(float x) {
 /* Fc_layer
  * din: 3D array of 12 * 12 * 8
  * dout: 1D array of 10 */
-void fc_layer(float din[POOL_OUT_DIM_X][POOL_OUT_DIM_Y][POOL_OUT_DIM_Z], float* dout) {
+void fc_layer(float din[POOL_OUT_DIM_X][POOL_OUT_DIM_Y][POOL_OUT_DIM_Z], float *dout) {
     for (int n = 0; n < FC_OUT_DIM_X; n++) {
         float inputv = 0;
         for (int i = 0; i < FC_IN_DIM_X; i++) {
@@ -104,10 +104,10 @@ void fc_layer(float din[POOL_OUT_DIM_X][POOL_OUT_DIM_Y][POOL_OUT_DIM_Z], float* 
     }
 }
 
-void cnn(float** img, float* result) {
-    float layer1_out[CONV_OUT_DIM_X][CONV_OUT_DIM_Y][CONV_OUT_DIM_Z]{ 0 };
-    float layer2_out[RELU_DIM_X][RELU_DIM_Y][RELU_DIM_Z]{ 0 };
-    float layer3_out[POOL_OUT_DIM_X][POOL_OUT_DIM_Y][POOL_OUT_DIM_Z]{ 0 };
+void cnn(float img[28][28], float result[10]) {
+    float layer1_out[CONV_OUT_DIM_X][CONV_OUT_DIM_Y][CONV_OUT_DIM_Z] = { 0 };
+    float layer2_out[RELU_DIM_X][RELU_DIM_Y][RELU_DIM_Z] = { 0 };
+    float layer3_out[POOL_OUT_DIM_X][POOL_OUT_DIM_Y][POOL_OUT_DIM_Z] = { 0 };
 
     conv_layer(img, layer1_out);
     relu_layer(layer1_out, layer2_out);
