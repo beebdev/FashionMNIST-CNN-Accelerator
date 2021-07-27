@@ -223,6 +223,7 @@ example1
 example2
 getParameters
 weights.txt
+original_fc_layer.cpp
 
 ## cnn_classification
 fashionMNIST

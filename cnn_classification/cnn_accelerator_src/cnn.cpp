@@ -1,5 +1,5 @@
 #include "cnn.h"
-#include "weights.h"
+#include "../include/weights.h"
 #include <math.h>
 #include <float.h>
 
@@ -76,7 +76,7 @@ void pool_layer(float din[RELU_DIM_X][RELU_DIM_Y][RELU_DIM_Z], float dout[POOL_O
 
 /* FC Helper Function */
 int map(float dz, float dy, float dx) {
-    return dz * (FC_IN_DIM_X * FC_IN_DIM_Y) + dy * (FC_IN_DIM_X)+dx;
+    return dz * (FC_IN_DIM_X * FC_IN_DIM_Y) + dy * (FC_IN_DIM_X) + dx;
 }
 
 float activator_function(float x) {
@@ -90,11 +90,12 @@ float activator_function(float x) {
  * din: 3D array of 12 * 12 * 8
  * dout: 1D array of 10 */
 void fc_layer(float din[POOL_OUT_DIM_X][POOL_OUT_DIM_Y][POOL_OUT_DIM_Z], float dout[FC_OUT_DIM_X]) {
-    for (int n = 0; n < FC_OUT_DIM_X; n++) {
+    
+    fc_loop_4: for (int n = 0; n < FC_OUT_DIM_X; n++) {
         float inputv = 0;
-        for (int i = 0; i < FC_IN_DIM_X; i++) {
-            for (int j = 0; j < FC_IN_DIM_Y; j++) {
-                for (int z = 0; z < FC_IN_DIM_Z; z++) {
+        fc_loop_3: for (int i = 0; i < FC_IN_DIM_X; i++) {
+            fc_loop_2: for (int z = 0; z < FC_IN_DIM_Z; z++) {
+                fc_loop_1: for (int j = 0; j < FC_IN_DIM_Y; j++) {
                     int m = map(z, j, i);
                     inputv += din[i][j][z] * fc_weights[m][n];
                 }
@@ -105,9 +106,9 @@ void fc_layer(float din[POOL_OUT_DIM_X][POOL_OUT_DIM_Y][POOL_OUT_DIM_Z], float d
 }
 
 void cnn(float img[28][28], float result[10]) {
-    float layer1_out[CONV_OUT_DIM_X][CONV_OUT_DIM_Y][CONV_OUT_DIM_Z]{ 0 };
-    float layer2_out[RELU_DIM_X][RELU_DIM_Y][RELU_DIM_Z]{ 0 };
-    float layer3_out[POOL_OUT_DIM_X][POOL_OUT_DIM_Y][POOL_OUT_DIM_Z]{ 0 };
+    float layer1_out[CONV_OUT_DIM_X][CONV_OUT_DIM_Y][CONV_OUT_DIM_Z] = { 0 };
+    float layer2_out[RELU_DIM_X][RELU_DIM_Y][RELU_DIM_Z] = { 0 };
+    float layer3_out[POOL_OUT_DIM_X][POOL_OUT_DIM_Y][POOL_OUT_DIM_Z] = { 0 };
 
     conv_layer(img, layer1_out);
     relu_layer(layer1_out, layer2_out);
