@@ -3,4 +3,4 @@
 ## Please DO NOT edit it.
 ## Copyright (C) 1986-2020 Xilinx, Inc. All Rights Reserved.
 ############################################################
-set_directive_pipeline "fc_layer/fc_loop_2"
+set_directive_pipeline "fc_layer/fc_loop_1"
