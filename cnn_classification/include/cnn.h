@@ -1,3 +1,3 @@
 #include <stdint.h>
 
-void cnn(float **img, float *result);
+void cnn(float img[28][28], float result[10]);
