@@ -1,5 +1,5 @@
-#include "cnn.h"
-#include "weights.h"
+#include "../include/cnn.h"
+#include "../include/weights.h"
 #include <math.h>
 #include <float.h>
 
@@ -91,17 +91,20 @@ float activator_function(float x) {
  * dout: 1D array of 10 */
 void fc_layer(float din[POOL_OUT_DIM_X][POOL_OUT_DIM_Y][POOL_OUT_DIM_Z], float dout[FC_OUT_DIM_X]) {
     
-    fc_loop_4: for (int n = 0; n < FC_OUT_DIM_X; n++) {
-        float inputv = 0;
-        fc_loop_3: for (int i = 0; i < FC_IN_DIM_X; i++) {
-            fc_loop_2: for (int z = 0; z < FC_IN_DIM_Z; z++) {
-                fc_loop_1: for (int j = 0; j < FC_IN_DIM_Y; j++) {
-                    int m = map(z, j, i);
-                    inputv += din[i][j][z] * fc_weights[m][n];
+    float inputv[FC_OUT_DIM_X] = {0};
+    fc_loop_3: for (int i = 0; i < FC_IN_DIM_X; i++) {
+        fc_loop_2: for (int z = 0; z < FC_IN_DIM_Z; z++) {
+            fc_loop_1: for (int j = 0; j < FC_IN_DIM_Y; j++) {
+                int m = map(z, j, i);
+                fc_loop_0 : for (int n = 0; n < FC_OUT_DIM_X; n++) {
+                    inputv[n] += din[i][j][z] * fc_weights[m][n];
                 }
             }
         }
-        dout[n] = activator_function(inputv);
+    }
+
+    fc_activation_loop: for (int n = 0; n < FC_OUT_DIM_X; n++) {
+        dout[n] = activator_function(inputv[n]);
     }
 }
 
