@@ -6,14 +6,24 @@
 #include "cnn.h"
 
 int main() {
-    // std::cout << logo << std::endl;
-
     /* Read test cases */
     cases_t cases = read_test_cases();
 
     /* Stats var */
     double total_duration = 0.0;
     long int correct = 0;
+
+    // for (int i = 0; i < 28; i++) {
+    //     for (int j = 0; j < 28; j++) {
+    //         std::cout << cases.c_data[0].img[i][j] << ", " << std::ends;
+    //     }
+    //     std::cout << std::endl;
+    // }
+
+    // for (int i = 0; i < 10; i++) {
+    //     std::cout << cases.c_data[0].output[i] << ", " << std::ends;
+    // }
+    // std::cout << std::endl;
 
     /* Run classification on test cases */
     std::cout << "Starting classification!" << std::endl;

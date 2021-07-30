@@ -1,5 +1,5 @@
-#include "cnn.h"
-#include "weights.h"
+#include "../include/cnn.h"
+#include "../include/weights.h"
 #include <math.h>
 #include <float.h>
 
@@ -11,13 +11,18 @@ float kernel_conv(float din[CONV_IN_DIM_X][CONV_IN_DIM_Y], int x, int y, int fil
     int o_y = y * CONV_STRIDE;
 
     float sum = 0;
-    for (int i = 0; i < CONV_EXTFILTER; i++) {
-        for (int j = 0; j < CONV_EXTFILTER; j++) {
+    kernel_conv_label0: for (int i = 0; i < CONV_EXTFILTER; i++) {
+        kernel_conv_label1: for (int j = 0; j < CONV_EXTFILTER; j++) {
             float f = conv_filter[filter][i][j];
             float v = din[o_x + i][o_y + j];
             sum += f * v;
         }
     }
+
+    if (sum < 0) {
+    	return 0;
+    }
+
     return sum;
 }
 
@@ -25,10 +30,11 @@ float kernel_conv(float din[CONV_IN_DIM_X][CONV_IN_DIM_Y], int x, int y, int fil
  * din: 2D array of 28*28
  * dout: 3D array of */
 void conv_layer(float din[CONV_IN_DIM_X][CONV_IN_DIM_Y], float dout[CONV_OUT_DIM_X][CONV_OUT_DIM_Y][CONV_OUT_DIM_Z]) {
-    for (int filter = 0; filter < CONV_NFILTERS; filter++) {
-        for (int x = 0; x < CONV_OUT_DIM_X; x++) {
-            for (int y = 0; y < CONV_OUT_DIM_Y; y++) {
+	conv_layer_label0: for (int filter = 0; filter < CONV_NFILTERS; filter++) {
+    	conv_layer_label1: for (int x = 0; x < CONV_OUT_DIM_X; x++) {
+            conv_layer_label2: for (int y = 0; y < CONV_OUT_DIM_Y; y++) {
                 // Call kernel convolution
+
                 dout[x][y][filter] = kernel_conv(din, x, y, filter);
             }
         }
@@ -36,25 +42,24 @@ void conv_layer(float din[CONV_IN_DIM_X][CONV_IN_DIM_Y], float dout[CONV_OUT_DIM
 }
 
 
-void relu_layer(float din[CONV_OUT_DIM_X][CONV_OUT_DIM_Y][CONV_OUT_DIM_Z], float dout[RELU_DIM_X][RELU_DIM_Y][RELU_DIM_Z]) {
-    for (int x = 0; x < RELU_DIM_X; x++) {
-        for (int y = 0; y < RELU_DIM_Y; y++) {
-            for (int z = 0; z < RELU_DIM_Z; z++) {
-                float v = din[x][y][z];
-                if (v < 0) {
-                    v = 0;
-                }
-                dout[x][y][z] = v;
-            }
-        }
-    }
-}
+//void relu_layer(float din[CONV_OUT_DIM_X][CONV_OUT_DIM_Y][CONV_OUT_DIM_Z], float dout[RELU_DIM_X][RELU_DIM_Y][RELU_DIM_Z]) {
+//	relu_layer_label0: for (int x = 0; x < RELU_DIM_X; x++) {
+//		relu_layer_label1: for (int y = 0; y < RELU_DIM_Y; y++) {
+//			relu_layer_label2: for (int z = 0; z < RELU_DIM_Z; z++) {
+//                float v = din[x][y][z];
+//                if (v < 0) {
+//                    v = 0;
+//                }
+//                dout[x][y][z] = v;
+//            }
+//        }
+//    }
+//}
 
 /* Pool_layer
  * din: 2D array of 24 * 24
  * dout: 3D array of 12 * 12 * 8 */
 void pool_layer(float din[RELU_DIM_X][RELU_DIM_Y][RELU_DIM_Z], float dout[POOL_OUT_DIM_X][POOL_OUT_DIM_Y][POOL_OUT_DIM_Z]) {
-    // TODO: implement me
     for (int x = 0; x < POOL_OUT_DIM_X; x++) {
         for (int y = 0; y < POOL_OUT_DIM_Y; y++) {
             for (int z = 0; z < POOL_OUT_DIM_Z; z++) {
@@ -105,12 +110,12 @@ void fc_layer(float din[POOL_OUT_DIM_X][POOL_OUT_DIM_Y][POOL_OUT_DIM_Z], float *
 }
 
 void cnn(float img[28][28], float result[10]) {
-    float layer1_out[CONV_OUT_DIM_X][CONV_OUT_DIM_Y][CONV_OUT_DIM_Z] = { 0 };
-    float layer2_out[RELU_DIM_X][RELU_DIM_Y][RELU_DIM_Z] = { 0 };
-    float layer3_out[POOL_OUT_DIM_X][POOL_OUT_DIM_Y][POOL_OUT_DIM_Z] = { 0 };
+    float layer1_out[CONV_OUT_DIM_X][CONV_OUT_DIM_Y][CONV_OUT_DIM_Z];
+//    float layer2_out[RELU_DIM_X][RELU_DIM_Y][RELU_DIM_Z];
+    float layer2_out[POOL_OUT_DIM_X][POOL_OUT_DIM_Y][POOL_OUT_DIM_Z];
 
     conv_layer(img, layer1_out);
-    relu_layer(layer1_out, layer2_out);
-    pool_layer(layer2_out, layer3_out);
-    fc_layer(layer3_out, result);
+//    relu_layer(layer1_out, layer2_out);
+    pool_layer(layer1_out, layer2_out);
+    fc_layer(layer2_out, result);
 }

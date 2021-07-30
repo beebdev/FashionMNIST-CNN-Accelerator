@@ -1,9 +1,10 @@
-open_project fft_stages.proj -reset
-add_files fft_stages.cpp
-add_files fft_stages.h
-set_top fft_streaming
-open_solution "solution1" -reset
-set_part {xczu7ev-ffvc1156-2-e}
+open_project cnn_hls_proj
+set_top cnn
+add_files src/cnn.cpp
+add_files include/cnn.h
+add_files include/weights.h
+add_files -tb src/cnn_top.cpp
+open_solution "solution1"
+set_part {xc7z020clg484-1}
 create_clock -period 10
-csynth_design
 exit

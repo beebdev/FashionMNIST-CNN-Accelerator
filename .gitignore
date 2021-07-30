@@ -226,6 +226,7 @@ weights.txt
 
 ## cnn_classification
 fashionMNIST
+cnn_hls_proj
 
 # End of https://www.toptal.com/developers/gitignore/api/c++,c,python
 {"mode":"full","isActive":false}
