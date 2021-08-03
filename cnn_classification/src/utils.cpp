@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <fstream>
+#include <unistd.h>
 
-#include "utils.h"
+#include "../include/utils.h"
 
 using namespace std;
 
@@ -29,10 +30,13 @@ uint8_t *read_file(const char *szFile) {
 
 cases_t read_test_cases() {
     printf("Reading test cases...");
+    char cwd[1024];
+    getcwd(cwd, sizeof(cwd));
+    printf("%s\n", cwd)
 
     cases_t cases;
-    uint8_t *test_image = read_file("../data/Fashion/t10k-images-idx3-ubyte");
-    uint8_t *test_labels = read_file("../data/Fashion/t10k-labels-idx1-ubyte");
+    uint8_t *test_image = read_file("../../../data/Fashion/t10k-images-idx3-ubyte");
+    uint8_t *test_labels = read_file("../../../data/Fashion/t10k-labels-idx1-ubyte");
     cases.case_count = byteswap_uint32(*(uint32_t *) (test_image + 4));
     cases.c_data = (case_t *) malloc(cases.case_count * sizeof(case_t));
 
@@ -44,7 +48,7 @@ cases_t read_test_cases() {
         // }
 
         /* malloc space for output data */
-        cases.c_data[c].output = (float *) malloc(10 * sizeof(float));
+        cases.c_data[c].output = (VALUE_TYPE *) malloc(10 * sizeof(float));
 
         /* Pointer to image and label data */
         uint8_t *img = test_image + 16 + c * (28 * 28);
@@ -84,10 +88,10 @@ void free_test_cases(cases_t cases) {
     }
 }
 
-bool max_bin(float *expected, float *obtained) {
+bool max_bin(VALUE_TYPE *expected, VALUE_TYPE *obtained) {
     int expected_category = 0;
     int obtained_category = 0;
-    float max = -1.0;
+    VALUE_TYPE max = -1.0;
     for (int i = 0; i < 10; i++) {
         if (expected[i] == 1.0) {
             expected_category = i;

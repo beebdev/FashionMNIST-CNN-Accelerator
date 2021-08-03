@@ -1,8 +1,9 @@
 #include <stdint.h>
+#include "cnn.h"
 
 typedef struct case_t {
-  float img[28][28];
-  float *output;
+  VALUE_TYPE img[28][28];
+  VALUE_TYPE *output;
 } case_t;
 
 typedef struct cases_t {
@@ -12,4 +13,4 @@ typedef struct cases_t {
 
 cases_t read_test_cases();
 void free_test_cases(cases_t cases);
-bool max_bin(float *expected, float *obtained);
+bool max_bin(VALUE_TYPE *expected, VALUE_TYPE *obtained);

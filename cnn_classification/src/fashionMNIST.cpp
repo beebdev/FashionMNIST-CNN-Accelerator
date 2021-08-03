@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <iostream>
 #include <sys/time.h>
-#include "utils.h"
-#include "cnn.h"
+#include "../include/utils.h"
+#include "../include/cnn.h"
 
 int main() {
     /* Read test cases */
@@ -35,7 +35,7 @@ int main() {
 
         /* Current test case */
         case_t curr_case = cases.c_data[c];
-        float results[10];
+        VALUE_TYPE results[10];
 
         /* Task interval stats */
         struct timeval t1, t2;
